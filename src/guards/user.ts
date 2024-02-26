@@ -1,13 +1,13 @@
-import { CanActivate, Injectable, ExecutionContext } from "@nestjs/common";
-import { Observable } from "rxjs";
-import { Request } from "express";
-import * as jwt from "jsonwebtoken";
-import { User } from "src/user/entities/user.entity";
+import { CanActivate, Injectable, ExecutionContext } from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { Request } from 'express';
+import * as jwt from 'jsonwebtoken';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   canActivate(
-    context: ExecutionContext
+    context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
     const authHeader = request.headers.authorization;
@@ -16,7 +16,7 @@ export class AuthGuard implements CanActivate {
       return false;
     }
 
-    const authToken = authHeader.split(" ")[1].trim();
+    const authToken = authHeader.split(' ')[1].trim();
 
     jwt.verify(
       authToken,
@@ -26,8 +26,8 @@ export class AuthGuard implements CanActivate {
           return false;
         }
 
-        request["user"] = decode;
-      }
+        request['user'] = decode;
+      },
     );
 
     return true;
