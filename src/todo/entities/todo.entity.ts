@@ -1,9 +1,11 @@
+import { User } from 'src/user/entities/user.entity';
 import {
   PrimaryGeneratedColumn,
   Column,
   Entity,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity()
@@ -28,6 +30,9 @@ export class Todo {
     default: false,
   })
   isCompleted: boolean;
+
+  @ManyToOne(() => User, (user) => user.todos)
+  author: User;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

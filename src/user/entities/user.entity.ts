@@ -1,9 +1,11 @@
+import { Todo } from 'src/todo/entities/todo.entity';
 import {
   PrimaryGeneratedColumn,
   Column,
   Entity,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -29,6 +31,9 @@ export class User {
     nullable: false,
   })
   password: string;
+
+  @OneToMany(() => Todo, (todo) => todo.author)
+  todos: Todo[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

@@ -24,6 +24,8 @@ export class UserController {
   @Post('/signup')
   async signup(@Body() createUserDto: CreateUserDto, @Res() res) {
     try {
+      console.log(createUserDto);
+
       const existingUser: User = await this.userService.findOne<string>(
         'email',
         createUserDto.email,
@@ -51,6 +53,7 @@ export class UserController {
         access_token: accessToken,
       });
     } catch (err) {
+      console.log(err);
       return res.json(err);
     }
   }

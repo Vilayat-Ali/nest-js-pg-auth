@@ -43,6 +43,6 @@ export class UserService {
   }
 
   remove(id: string): Promise<any> {
-    return this.userRepository.softRemove(id as any);
+    return this.userRepository.delete(id as any);
   }
 }
