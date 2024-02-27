@@ -16,6 +16,7 @@ export class AuthGuard implements CanActivate {
       return false;
     }
 
+    // Bearer <TOKEN>
     const authToken = authHeader.split(' ')[1].trim();
 
     jwt.verify(

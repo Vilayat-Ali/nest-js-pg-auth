@@ -9,28 +9,28 @@ import {
   UseGuards,
   Req,
   Res,
-} from "@nestjs/common";
-import { AuthGuard } from "src/guards/user";
-import { TodoService } from "./todo.service";
-import { CreateTodoDto } from "./dto/create-todo.dto";
-import { UpdateTodoDto } from "./dto/update-todo.dto";
-import { UserService } from "src/user/user.service";
+} from '@nestjs/common';
+import { AuthGuard } from 'src/guards/user';
+import { TodoService } from './todo.service';
+import { CreateTodoDto } from './dto/create-todo.dto';
+import { UpdateTodoDto } from './dto/update-todo.dto';
+import { UserService } from 'src/user/user.service';
 
-@Controller("todo")
+@Controller('todo')
 export class TodoController {
   constructor(
     private readonly todoService: TodoService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
   ) {}
 
   @Post()
   @UseGuards(AuthGuard)
   async create(@Req() Req, @Res() res, @Body() createTodoDto: CreateTodoDto) {
     try {
-      const author = await this.userService.findOne("email", Req.user.email);
-      createTodoDto["author"] = author;
+      const author = await this.userService.findOne('email', Req.user.email);
+      createTodoDto['author'] = author;
       await this.todoService.create(createTodoDto);
-      return res.json({ message: "Todo added successfully!" });
+      return res.json({ message: 'Todo added successfully!' });
     } catch (err: any) {
       return res.json(err);
     }
@@ -40,21 +40,36 @@ export class TodoController {
   @UseGuards(AuthGuard)
   async findAll(@Req() req, @Res() res) {
     try {
-      const author = await this.userService.findOne("email", req.user.email);
-      const todos = await this.todoService.findAll(author);
-      return res.json({ message: "Todos fetched successfully!", todos });
+      const todos = await this.todoService.findAll(req.user.email);
+      return res.json({ message: 'Todos fetched successfully!', todos });
     } catch (err: any) {
       return res.json(err);
     }
   }
 
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateTodoDto: UpdateTodoDto) {
-    return this.todoService.update(id, updateTodoDto);
+  @Patch(':id')
+  @UseGuards(AuthGuard)
+  async update(
+    @Req() req,
+    @Res() res,
+    @Param('id') id: string,
+    @Body() updateTodoDto: UpdateTodoDto,
+  ) {
+    try {
+      await this.todoService.update(id, req.user.email, updateTodoDto);
+      return res.json({ message: 'Todo updated successfully!' });
+    } catch (err: any) {
+      return res.json(err);
+    }
   }
 
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.todoService.remove(id);
+  @Delete(':id')
+  async remove(@Req() req, @Res() res, @Param('id') id: string) {
+    try {
+      await this.todoService.remove(id, req.user.email);
+      return res.json({ message: 'Todo deleted successfully!' });
+    } catch (err: any) {
+      return res.json(err);
+    }
   }
 }

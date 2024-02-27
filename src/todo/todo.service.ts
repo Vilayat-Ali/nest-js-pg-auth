@@ -5,7 +5,6 @@ import { EntityManager, Repository, UpdateResult } from "typeorm";
 import { Todo } from "./entities/todo.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserService } from "src/user/user.service";
-import { User } from "src/user/entities/user.entity";
 
 @Injectable()
 export class TodoService {
@@ -22,7 +21,7 @@ export class TodoService {
   }
 
   public findAll(
-    user: User,
+    userEmail: string,
     page: number = 1,
     size: number = 20
   ): Promise<[Todo[], number]> {
@@ -30,7 +29,7 @@ export class TodoService {
     return this.todoRepository.findAndCount({
       where: {
         author: {
-          id: user.id,
+          email: userEmail,
         },
       },
       skip,
@@ -48,11 +47,28 @@ export class TodoService {
     return this.todoRepository.findOne(id as any);
   }
 
-  update(id: string, updateTodoDto: UpdateTodoDto): Promise<UpdateResult> {
-    return this.todoRepository.update(id, updateTodoDto);
+  public update(
+    id: string,
+    userEmail: string,
+    updateTodoDto: UpdateTodoDto
+  ): Promise<UpdateResult> {
+    return this.todoRepository.update(
+      {
+        author: {
+          email: userEmail,
+        },
+        id: Number(id),
+      },
+      updateTodoDto
+    );
   }
 
-  remove(id: string): Promise<any> {
-    return this.todoRepository.delete(id as any);
+  remove(id: string, currrUserEmail: string): Promise<any> {
+    return this.todoRepository.delete({
+      author: {
+        email: currrUserEmail,
+      },
+      id: Number(id),
+    });
   }
 }
